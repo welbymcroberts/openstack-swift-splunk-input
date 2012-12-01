@@ -25,6 +25,13 @@ SCHEME = """<scheme>
                 <title>API key</title>
                 <description>Your API key.</description>
             </arg>
+
+            <arg name="api_endpoint">
+                <title>API endpoint</title>
+                <description>Your API AUTH Endpoint (for example lon.auth.rackspacecloud.com).</description>
+            </arg>
+
+
         </args>
     </endpoint>
 </scheme>
