@@ -1,3 +1,16 @@
+import sys
+import logging
+
+
+# Setting up loggin for splunkd
+logging.root
+logging.root.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)s %(message)s')
+handler = logging.StreamHandler()
+handler.setFormatter(formatter)
+logging.root.addHandler(handler)
+
+
 # Splunk Requires a Introspection scheme, setting a var for this for now
 SCHEME = """<scheme>
     <title>Openstack Swift</title>
