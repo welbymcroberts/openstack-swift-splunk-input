@@ -1,6 +1,8 @@
 import sys
 import logging
-
+import httplib
+import xml.dom.minidom, xml.sax.saxutils
+from pprint import pprint as pp
 
 # Setting up loggin for splunkd
 logging.root
@@ -50,6 +52,9 @@ SCHEME = """<scheme>
 </scheme>
 """
 
+# Swift Auth Token and Storage URI
+url = None
+auth_token = None
 
 def do_scheme():
     print SCHEME
@@ -100,14 +105,41 @@ def get_config():
     return config
 
 def validate_conf(config):
+    do_auth(config)
+
+def print_error(s):
+    print "<error><message>%s</message></error>" % xml.sax.saxutils.escape(s)
+
+
+def do_auth(config):
+    global auth_token
+    global url
     try:
         #Try to auth against endpoint here
+        conn = httplib.HTTPSConnection(config['api_endpoint'])
+        headers = {'X-Auth-User': config['api_id'], 
+                   'X-Auth-Key': config['api_key']}
+        conn.request('GET', '/v1.0', headers=headers)
+        resp = conn.getresponse()
+        auth_token = resp.getheader('x-auth-token')
+        url = resp.getheader('x-storage-url')
+        conn.close()
     except Exception,e:
+       logging.error("Invalid configuration: %s" % str(e))
        print_error("Invalid configuration provided: %s" % str(e))
        sys.exit(1)
 
+def get_file(config,file):
+    send_headers = {'X-Auth-Token': auth_token, 'Content-Type': 'text/plain'}
+    path = '/'+'/'.join(url.split('/')[3:])+'/'+file
+    conn = httplib.HTTPSConnection(url.split('/')[2])
+    conn.request('GET', path, headers=send_headers) 
+    resp = conn.getresponse().read()
+    conn.close()
+    return resp
+
 def run():
-    pass
+    validate_conf({})
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
