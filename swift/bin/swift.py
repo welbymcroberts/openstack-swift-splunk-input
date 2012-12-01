@@ -93,19 +93,29 @@ def get_config():
             raise Exception, "Invalid configuration received from Splunk."
 
         # just some validation: make sure these keys are present (required)
-        validate_conf(config, "name")
-        validate_conf(config, "key_id")
-        validate_conf(config, "secret_key")
-        validate_conf(config, "checkpoint_dir")
+        validate_conf(config)
     except Exception, e:
         raise Exception, "Error getting Splunk configuration via STDIN: %s" % str(e)
 
     return config
 
+def validate_conf(config):
+    try:
+        #Try to auth against endpoint here
+    except Exception,e:
+       print_error("Invalid configuration provided: %s" % str(e))
+       sys.exit(1)
+
+def run():
+    pass
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         if sys.argv[1] == "--scheme":
             do_scheme()
+    else:
+        run()
 
 
+
+sys.exit(0)
